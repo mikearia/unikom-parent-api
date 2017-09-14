@@ -128,9 +128,9 @@ $app->get('/keluhan/{id_ortu}', function ($request, $response){
         $pre = $con->prepare($sql,array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $values = array(':id_ortu' => $id_ortu);
         $pre->execute($values);
-        $result = $pre->fetch();
+        $result[] = $pre->fetch();
         if($result){
-          return $response->withJson(array('status'=>'Succes', array('result'=>$result)),200);
+          return $response->withJson(array('status'=>'Succes', 'result'=>$result),200);
         } else {
           return $response->withJson(array('status'=> 'Keluhan Not Found'),422);
         }
@@ -200,7 +200,7 @@ $app->get('/krs/{nim}', function($request, $response){
 		$pre = $con->prepare($sql,array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$values = array(':nim' => $nim);
 		$pre->execute($values);
-		$result = $pre->fetch();
+		$result[] = $pre->fetch();
 		if($result){
 			return $response->withJson(array('status'=>'Succes', 'result' => $result),200);
 		} else {
@@ -220,11 +220,51 @@ $app->get('/status_aktif/{nim}', function($request, $response){
     $pre = $con->prepare($sql,array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
     $values = array(':nim' => $nim);
     $pre->execute($values);
-    $result = $pre->fetch();
+    $result[] = $pre->fetch();
     if($result){
-      return $response->withJson(array('status' => 'Succes', array('result' => $result)),200);
+      return $response->withJson(array('status' => 'Succes', 'result' => $result),200);
     } else {
       return $response->withJson(array('status' => 'Not Found'), 422);
+    }
+  }
+  catch(\Exception $ex){
+    return $response->withJson(array('error' => $ex->getMessage()),422);
+  }
+});
+
+$app->get('/transkrip/{nim}', function($request, $response){
+  try{
+    $nim = $request->getAttribute('nim');
+    $con = $this->db;
+    $sql = "SELECT matkul.nama_matkul, nilai.indeks, nilai.nilai FROM nilai INNER JOIN matkul ON nilai.id_matkul = matkul.id_matkul WHERE nilai.nim = ".$nim."";
+    $result = null;
+    foreach ($con->query($sql) as $row) {
+         $result[] = $row;
+     }
+     if($result){
+         return $response->withJson(array('status' => 'Succes', 'results'=>$result),200);
+     }else{
+         return $response->withJson(array('status' => 'Transkrip Not Found'),422);
+     }
+  }
+  catch(\Exception $ex){
+    return $response->withJson(array('error' => $ex->getMessage()),422);
+  }
+});
+
+$app->get('/nilai/{nim}', function($request, $response){
+  try{
+    $nim = $request->getAttribute('nim');
+    $con = $this->db;
+    $sql = "SELECT matkul.nama_matkul, nilai.indeks, nilai.nilai FROM nilai INNER JOIN matkul ON nilai.id_matkul = matkul.id_matkul WHERE nilai.nim = :nim AND nilai.semester = :semester";
+    $pre = $con->prepare($sql,array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+    $values = array(':semester' => $request->getParam('semester'));
+    $pre->execute($values);
+    $result[] = $pre->fetch();
+    if($result){
+      return $response->withJson(array('status' => 'Succes', 'results'=>$result),200);
+    }else{
+      return $response->withJson(array('status' => 'Transkrip Not Found'),422);
     }
   }
   catch(\Exception $ex){
