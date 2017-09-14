@@ -125,6 +125,28 @@ CREATE TABLE `matkul` (
 
 insert  into `matkul`(`id_matkul`,`nama_matkul`) values ('1','Algoritma dan Pemrograman'),('2','Kalkulus'),('3','Fisika'),('4','Aplikasi IT');
 
+/*Table structure for table `nilai` */
+
+DROP TABLE IF EXISTS `nilai`;
+
+CREATE TABLE `nilai` (
+  `id_nilai` int(8) NOT NULL,
+  `id_matkul` varchar(8) DEFAULT NULL,
+  `semester` int(2) DEFAULT NULL,
+  `indeks` set('A','B','C','D','E','T') DEFAULT NULL,
+  `nilai` int(3) DEFAULT NULL,
+  `nim` varchar(8) DEFAULT NULL,
+  PRIMARY KEY (`id_nilai`),
+  KEY `id_matkul_nilai` (`id_matkul`),
+  KEY `nim_nilai` (`nim`),
+  CONSTRAINT `id_matkul_nilai` FOREIGN KEY (`id_matkul`) REFERENCES `matkul` (`id_matkul`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `nim_nilai` FOREIGN KEY (`nim`) REFERENCES `mahasiswa` (`nim`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `nilai` */
+
+insert  into `nilai`(`id_nilai`,`id_matkul`,`semester`,`indeks`,`nilai`,`nim`) values (1,'2',2,'A',89,'10114453');
+
 /*Table structure for table `orangtua` */
 
 DROP TABLE IF EXISTS `orangtua`;
